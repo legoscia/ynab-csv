@@ -39,9 +39,13 @@ class window.DataObject
   #     pass in false or null to do all.
   # lookup: hash definition of YNAB column names to selected base column names. Lets us
   #     convert the uploaded CSV file into the columns that YNAB expects.
-  converted_json: (limit, lookup) ->
+  converted_json: (limit, lookup, swap_sign) ->
     return nil if @base_json == null
     value = []
+    if swap_sign
+      sign = -1
+    else
+      sign = 1
 
     # TODO: You might want to check for errors. Papaparse has an errors field.
     if @base_json.data
@@ -55,13 +59,13 @@ class window.DataObject
             #   the rest are just returned as they are.
             switch col
               when 'Outflow'
-                number = numberfy(cell)
+                number = numberfy(cell) * sign
                 if lookup['Outflow'] == lookup['Inflow']
                   tmp_row[col] = Math.abs(number) if number < 0
                 else
                   tmp_row[col] = number
               when 'Inflow'
-                number = numberfy(cell)
+                number = numberfy(cell) * sign
                 if lookup['Outflow'] == lookup['Inflow']
                   tmp_row[col] = number if number > 0
                 else
@@ -71,11 +75,11 @@ class window.DataObject
           value.push(tmp_row)
     value
 
-  converted_csv: (limit, lookup) ->
+  converted_csv: (limit, lookup, swap_sign) ->
     return nil if @base_json == null
     # Papa.unparse string
     string = ynab_cols.join(',') + "\n"
-    @.converted_json(limit, lookup).forEach (row) ->
+    @.converted_json(limit, lookup, swap_sign).forEach (row) ->
       row_values = []
       ynab_cols.forEach (col) ->
         row_values.push row[col]

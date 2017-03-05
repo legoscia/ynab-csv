@@ -67,13 +67,16 @@ angular.element(document).ready ->
       Memo:     'Memo'
       Outflow:  'Amount'
       Inflow:   'Amount'
+    # Need to use an object here, not just a boolean.
+    # See http://stackoverflow.com/questions/18642371/checkbox-not-binding-to-scope-in-angularjs
+    $scope.sign = {swap: false}
     $scope.data_object = new DataObject()
 
     $scope.$watch 'data.source', (newValue, oldValue) ->
       $scope.data_object.parse_csv(newValue) if newValue && newValue.length > 0
 
-    $scope.export = (limit) -> $scope.data_object.converted_json(limit, $scope.ynab_map)
-    $scope.csvString = -> $scope.data_object.converted_csv(null, $scope.ynab_map)
+    $scope.export = (limit) -> $scope.data_object.converted_json(limit, $scope.ynab_map, $scope.sign.swap)
+    $scope.csvString = -> $scope.data_object.converted_csv(null, $scope.ynab_map, $scope.sign.swap)
     $scope.downloadFile = ->
       a           = document.createElement('a')
       a.href      = 'data:attachment/csv;base64,' + btoa(unescape(encodeURIComponent($scope.csvString())))

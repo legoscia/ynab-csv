@@ -54,6 +54,11 @@
                       <select ng-model="ynab_map[col]" ng-options="f for f in data_object.fields()"></select>
                     </th>
                   </tr>
+		  <tr>
+		    <td colspan='{{ynab_cols.length}}'>
+		      <label><input type="checkbox" ng-model="sign.swap" />Swap positive / negative amounts</label>
+		    </td>
+		  </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat='row in export(10)'>
