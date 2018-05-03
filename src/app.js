@@ -75,13 +75,25 @@ angular.element(document).ready(function() {
             element.removeClass("dragging");
             event.preventDefault();
             event.stopPropagation();
-            reader = new FileReader();
-            reader.onload = function(loadEvent) {
-              scope.$apply(function() {
-                scope.dropzone = loadEvent.target.result;
-              });
-            };
-            reader.readAsText(event.dataTransfer.files[0], attributes.encoding);
+            // Accept either files or text for drag-and-drop
+            if (event.dataTransfer.files.length > 0) {
+              reader = new FileReader();
+              reader.onload = function(loadEvent) {
+                scope.$apply(function() {
+                  scope.dropzone = loadEvent.target.result;
+                });
+              };
+              reader.readAsText(event.dataTransfer.files[0], attributes.encoding);
+            }
+            else {
+              var index = event.dataTransfer.types.indexOf('text/plain');
+              event.dataTransfer.items[index].getAsString(
+                function(text) {
+                  scope.$apply(function() {
+                    scope.dropzone = text;
+                  })
+                });
+            }
           });
         }
       };
